@@ -1,0 +1,25 @@
+webflux:
+  database:
+      host: 127.0.0.1
+      port: 5432
+      name: webflux
+      schema: public
+      username: webflux
+      password: gorkem
+      pool:
+        size:
+          initial: 3
+          max: 10
+
+
+
+spring:
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://127.0.0.1:5432/webflux
+    user: webflux
+    password: gorkem
+    baseline-version: 0
+
+server:
+  port: 8081

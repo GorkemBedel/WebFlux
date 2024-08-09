@@ -1,0 +1,27 @@
+version: "3.8"
+
+
+services:
+    webflux-db:
+      image: postgres:13.1-alpine
+      container_name: webflux-db
+      ports:
+        - 5432:5432
+      restart: always
+      environment:
+        POSTGRES_USER: webflux
+        POSTGRES_PASSWORD: gorkem
+        POSTGRES_DB: webflux
+
+
+    pgadmin5:
+      image: dpage/pgadmin4
+      container_name: webflux-pgadmin
+      restart: always
+      ports:
+        - "8080:80"
+      environment:
+        PGADMIN_DEFAULT_EMAIL: "gorkem_bedel@hotmail.com"
+        PGADMIN_DEFAULT_PASSWORD: "gorkem"
+      depends_on:
+        - webflux-db
