@@ -17,7 +17,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
@@ -59,6 +58,9 @@ public class Student implements Serializable, Persistable<UUID> {
         return !this.isUpdated || id == null;
     }
 
+    public void setIsUpdated(boolean isUpdated) {
+        this.isUpdated = isUpdated;
+    }
 
 
 

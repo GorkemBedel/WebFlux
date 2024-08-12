@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/v1/student")
 public class StudentController {
@@ -25,5 +29,20 @@ public class StudentController {
     @PostMapping("/addStudent")
     public Mono<Student> addStudent(@RequestBody StudentDto student) {
         return studentService.addStudent(student);
+    }
+
+    @PutMapping("/update/{id}")
+    public Mono<Student> updateStudent(@PathVariable UUID id, @RequestBody StudentDto student) {
+        return studentService.updateStudent(id, student);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public Mono<Void> deleteById(@PathVariable UUID id){
+        return studentService.deleteStudent(id);
+    }
+
+    @DeleteMapping("/deleteAllByIdList")
+    public Mono<Void> deleteByIdList(@RequestBody Iterable<UUID> uuidList){
+        return studentService.deleteStudentsByIds(uuidList);
     }
 }

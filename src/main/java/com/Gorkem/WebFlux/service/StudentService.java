@@ -11,9 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,14 +40,14 @@ public class StudentService {
                             .collect(Collectors.toList());
 
                     Flux<CourseDto> courseDtoFlux = Flux.merge(courseDtoList);
-// *******************************************************************************************************************
+//                  ****************************************************************************************************
                     Mono<List<String>> courseNamesList =
                             Flux.fromIterable(student.getCourses()) //Gets students courses UUID's and find the course names from UUID's
                             .flatMap(courseService::findNameByUUID)
                             .collect(Collectors.toList());
 
                     Flux<List<String>> courseNamesFlux = courseNamesList.flatMapMany(Flux::just);
-// *******************************************************************************************************************
+//                  ****************************************************************************************************
 
                     return Flux.combineLatest(
                             courseDtoFlux.collectList(),
@@ -88,4 +86,54 @@ public class StudentService {
                 .doOnError(e -> System.out.println("Error: " + e.getMessage()));
         }
 
+    public Mono<Student> updateStudent(UUID id, StudentDto student) {
+
+        return studentRepository.findById(id)
+                .map(student1 -> {
+                    if(student.name() != null){
+                        student1.setName(student.name());
+                    }
+                    if(student.email() != null){
+                        student1.setEmail(student.email());
+                    }
+                    if(student.dateOfBirth() != null){
+                        student1.setDateOfBirth(student.dateOfBirth());
+                    }
+                    student1.setIsUpdated(true);
+                    if(student.courseNames() != null){
+                        List<Mono<UUID>> list = student.courseNames().stream().map(courseService::findUUIDByName).
+                                collect(Collectors.toList());
+                        return Flux.fromIterable(list)
+                                .flatMap(mono -> mono)
+                                .collectList()
+                                .flatMap(uuids -> {
+                                    student1.setCourses(convertToSet(uuids));
+                                    return Mono.just(student1);
+                                });
+
+                    }else{
+                        return Mono.just(student1);
+                    }
+
+
+                })
+                .flatMap(a -> a)
+                .flatMap(studentRepository::save)
+                .doOnError(e -> System.out.println("Error: " + e.getMessage()));
     }
+
+    public Mono<Void> deleteStudent(UUID id){
+        return studentRepository.deleteById(id);
+    }
+
+    public Mono<Void> deleteStudentsByIds(Iterable<UUID> studentIds){
+        return studentRepository.deleteAllById(studentIds)
+                .doOnSuccess(unused -> System.out.println("Deleted students with IDs: " + studentIds))
+                .doOnError(e -> System.out.println("Error deleting students: " + e.getMessage()));
+    }
+
+    public static Set<UUID> convertToSet(List<UUID> uuidList) {
+        return new HashSet<>(uuidList);
+    }
+
+}
