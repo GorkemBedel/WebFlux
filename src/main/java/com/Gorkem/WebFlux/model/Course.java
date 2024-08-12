@@ -1,6 +1,7 @@
 package com.Gorkem.WebFlux.model;
 
 import com.Gorkem.WebFlux.model.metadata.CourseMetadata;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "course")
 public class Course implements Serializable, Persistable<UUID> {
 

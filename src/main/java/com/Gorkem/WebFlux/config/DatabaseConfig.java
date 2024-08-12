@@ -2,7 +2,9 @@ package com.Gorkem.WebFlux.config;
 
 import com.Gorkem.WebFlux.model.converter.CourseMetadatatoJsonConverter;
 import com.Gorkem.WebFlux.model.converter.JsonToCourseMetaDataConverter;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
@@ -95,6 +97,11 @@ public class DatabaseConfig extends AbstractR2dbcConfiguration {
 
     @Bean
     public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         return new ObjectMapper();
     }
 

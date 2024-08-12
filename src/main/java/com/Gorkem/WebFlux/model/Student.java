@@ -1,6 +1,7 @@
 package com.Gorkem.WebFlux.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -16,6 +17,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "student")
 public class Student implements Serializable, Persistable<UUID> {
 
@@ -34,6 +37,7 @@ public class Student implements Serializable, Persistable<UUID> {
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
+    @Column("date_of_birth")
     private LocalDate dateOfBirth;
 
     private String email;
@@ -42,7 +46,7 @@ public class Student implements Serializable, Persistable<UUID> {
     private boolean isUpdated = false;
 
     @Column("course_id")
-    private Set<String> courses;
+    private Set<UUID> courses;
 
 
     @Override
