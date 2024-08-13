@@ -6,7 +6,7 @@ services:
       image: postgres:13.1-alpine
       container_name: webflux-db
       ports:
-        - 5432:5432
+        - "5432:5432"
       restart: always
       environment:
         POSTGRES_USER: webflux

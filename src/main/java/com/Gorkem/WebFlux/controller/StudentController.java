@@ -37,12 +37,12 @@ public class StudentController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public Mono<Void> deleteById(@PathVariable UUID id){
+    public Mono<String> deleteById(@PathVariable UUID id){
         return studentService.deleteStudent(id);
     }
 
     @DeleteMapping("/deleteAllByIdList")
-    public Mono<Void> deleteByIdList(@RequestBody Iterable<UUID> uuidList){
+    public Mono<List<String>> deleteByIdList(@RequestBody List<UUID> uuidList){
         return studentService.deleteStudentsByIds(uuidList);
     }
 }

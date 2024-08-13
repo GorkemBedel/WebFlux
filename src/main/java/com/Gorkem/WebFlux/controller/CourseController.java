@@ -12,7 +12,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/v1/courseController")
 public class CourseController {
-
     private final CourseService  courseService;
 
     public CourseController(CourseService courseService) {

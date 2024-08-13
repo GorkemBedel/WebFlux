@@ -4,7 +4,6 @@ import com.Gorkem.WebFlux.model.Course;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface CourseRepository extends ReactiveCrudRepository<Course, UUID> {

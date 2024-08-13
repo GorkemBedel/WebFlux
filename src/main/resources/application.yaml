@@ -12,14 +12,21 @@ webflux:
           max: 10
 
 
-
 spring:
+  main:
+    allow-bean-definition-overriding: true
+
   flyway:
     enabled: true
     url: jdbc:postgresql://127.0.0.1:5432/webflux
     user: webflux
     password: gorkem
     baseline-version: 0
+
+  data:
+    elasticsearch:
+      uris: localhost:9200
+
 
 server:
   port: 8081

@@ -3,28 +3,31 @@ package com.Gorkem.WebFlux.service;
 import com.Gorkem.WebFlux.dto.CourseDto;
 import com.Gorkem.WebFlux.dto.StudentDto;
 import com.Gorkem.WebFlux.dto.StudentListDto;
+import com.Gorkem.WebFlux.exceptions.StudentNotFoundException;
 import com.Gorkem.WebFlux.model.Student;
-import com.Gorkem.WebFlux.repository.StudentRepository;
+import com.Gorkem.WebFlux.repository.StudentR2dbcRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
 
-    private final StudentRepository studentRepository;
+    private final StudentR2dbcRepository studentRepository;
     private final CourseService courseService;
 
-    public StudentService(StudentRepository studentRepository, CourseService courseService) {
+    public StudentService(StudentR2dbcRepository studentRepository, CourseService courseService) {
         this.studentRepository = studentRepository;
         this.courseService = courseService;
     }
-
     public Flux<Student> getAllStudents() {
         return studentRepository.findAll();
     }
@@ -122,18 +125,32 @@ public class StudentService {
                 .doOnError(e -> System.out.println("Error: " + e.getMessage()));
     }
 
-    public Mono<Void> deleteStudent(UUID id){
-        return studentRepository.deleteById(id);
+    public Mono<String> deleteStudent(UUID id) {
+        return studentRepository.findById(id)
+                .switchIfEmpty(Mono.error(new StudentNotFoundException("There is no student with ID: " + id)))
+                .flatMap(existingStudent -> studentRepository.deleteById(id)
+                        .thenReturn("Deleted student with ID: " + id) // Silme işlemi tamamlandığında mesaj döndürülür
+                );
     }
 
-    public Mono<Void> deleteStudentsByIds(Iterable<UUID> studentIds){
-        return studentRepository.deleteAllById(studentIds)
-                .doOnSuccess(unused -> System.out.println("Deleted students with IDs: " + studentIds))
-                .doOnError(e -> System.out.println("Error deleting students: " + e.getMessage()));
+
+
+
+    public Mono<List<String>> deleteStudentsByIds(List<UUID> studentIds){
+
+        return Flux.fromIterable(studentIds)
+                .flatMap(studentRepository::findById)
+                .switchIfEmpty(Mono.error(new StudentNotFoundException("No students found with id :  " + studentIds))) // Eğer dönen student fluxı tamamen boşsa yani verilen UUID listesindeki tüm UUID ler geçersiz ise
+                .flatMap(student -> studentRepository.deleteById(student.getId()) //Bir tane bile geçerli UUID varsa silinen öğrencilerin UUID leri return ediliyor.
+                        .thenReturn("Deleted student with ID: " + student.getId()) // Silme işlemi tamamlandığında mesaj döndürülür
+                ).collect(Collectors.toList());
     }
 
     public static Set<UUID> convertToSet(List<UUID> uuidList) {
         return new HashSet<>(uuidList);
     }
+
+
+
 
 }
